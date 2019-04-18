@@ -20,19 +20,23 @@ describe('Tests on a site page (not news)', () => {
   beforeAll(async () => {
     const cache = new Cache();
 
-    console.time("login");  // https://github.com/smooth-code/jest-puppeteer , https://jestjs.io/docs/en/puppeteer.html
+    console.time("login");
 
     const {username, password, pageUrl} = configObj;
     
     let data = await cache.get("creds");
 
-    if(data === null) {
+    console.log(data);
+
+    if(data === undefined) {
       // Connect to SharePoint
       data = await spauth.getAuth(pageUrl, {
         username: cpass.decode(username),
         password: cpass.decode(password)
       });
     }
+
+    console.log(data);
 
     console.timeEnd("login");
 
@@ -72,7 +76,7 @@ describe('Tests on a site page (not news)', () => {
    * 
    * 30 seconds timeout
    */
-  test('Should load the page', async () => {
+  it('Should load the page', async () => {
     
     await page.screenshot({path: 'title-screenshot.png'});
 
