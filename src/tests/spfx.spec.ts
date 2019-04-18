@@ -17,6 +17,8 @@ describe('Tests on a site page (not news)', () => {
    * Create the browser and page context
    */
   beforeAll(async () => {
+    console.time("login");
+
     const {username, password, pageUrl} = configObj;
     
     // Connect to SharePoint
@@ -25,20 +27,30 @@ describe('Tests on a site page (not news)', () => {
       password: cpass.decode(password)
     });
 
+    console.timeEnd("login");
+
+    console.time("launch");
+
     browser = await puppeteer.launch();
     page = await browser.newPage();
     // Add the authentication headers
     await page.setExtraHTTPHeaders(data.headers);
     // Set default viewport
     await page.setViewport({
-      height: 2500,
+      height: 1280,
       width: 1200
     });
+
+    console.timeEnd("launch");
+
+    console.time("goto");
 
     // Open the page
     await page.goto(configObj.pageUrl, {
       waitUntil: 'networkidle0'
     });
+
+    console.timeEnd("goto");
   }, 30000);
 
   /**
@@ -54,6 +66,9 @@ describe('Tests on a site page (not news)', () => {
    * 30 seconds timeout
    */
   test('Should load the page', async () => {
+    
+    await page.screenshot({path: 'title-screenshot.png'});
+
     expect(page).not.toBeNull();
     expect(await page.title()).not.toBeNull();
     expect(await page.title()).toBe("Automated UI Tests - Home");
@@ -62,19 +77,19 @@ describe('Tests on a site page (not news)', () => {
   /**
    * Start of the other page tests
    */
-  test('Check if caption element is present in the web part', async () => {
-    const caption = await page.$('div[data-ui-test-id="caption"]');
-    expect(caption).not.toBeNull();
+  // test('Check if caption element is present in the web part', async () => {
+  //   const caption = await page.$('div[data-ui-test-id="caption"]');
+  //   expect(caption).not.toBeNull();
 
-    const captionTitle = await caption.$('p[data-ui-test-id="caption-title"]');
-    expect(captionTitle).not.toBeNull();
-  });
+  //   const captionTitle = await caption.$('p[data-ui-test-id="caption-title"]');
+  //   expect(captionTitle).not.toBeNull();
+  // });
 
-  /**
-   * Check the text in elements
-   */
-  test('Check if caption text is equal to "Automated UI Tests"', async () => {
-    const captionText = await page.evaluate(() => document.querySelector('p[data-ui-test-id="caption-title"]').textContent);
-    expect(captionText).toBe("Automated UI Tests");
-  });
+  // /**
+  //  * Check the text in elements
+  //  */
+  // test('Check if caption text is equal to "Automated UI Tests"', async () => {
+  //   const captionText = await page.evaluate(() => document.querySelector('p[data-ui-test-id="caption-title"]').textContent);
+  //   expect(captionText).toBe("Automated UI Tests");
+  // });
 });
